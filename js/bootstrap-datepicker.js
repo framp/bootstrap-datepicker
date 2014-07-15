@@ -91,6 +91,9 @@
 		this._process_options(options);
 
 		this.element = $(element);
+    this.originalName = this.element.attr('name');
+    this.element.attr('name', '');
+    this.element.after('<input type="hidden" name="' + this.originalName + '">');
 		this.isInline = false;
 		this.isInput = this.element.is('input');
 		this.component = this.element.is('.date') ? this.element.find('.add-on, .input-group-addon, .btn') : false;
@@ -498,15 +501,11 @@
 		setUTCDate: alias('setUTCDates'),
 
 		setValue: function(){
-			var formatted = this.getFormattedDate();
-			if (!this.isInput){
-				if (this.component){
-					this.element.find('input').val(formatted).change();
-				}
-			}
-			else {
-				this.element.val(formatted).change();
-			}
+      var element = this.element;
+			if (!this.isInput && this.component)
+        element = this.element.find('input');  
+      element.val(this.getFormattedDate()).change();
+      element.next('input[type=hidden]').val(this.getFormattedDate('YYYY-MM-DD'));
 		},
 
 		getFormattedDate: function(format){
